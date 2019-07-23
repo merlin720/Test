@@ -11,6 +11,8 @@ import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FileUtil {
 
@@ -207,6 +209,30 @@ public class FileUtil {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public static List<String> getFilesInPath(String path) {
+		List<String> list = new ArrayList<String>();
+		File file = new File(path);
+		File[] array = file.listFiles();
+		for (int i = 0; i < array.length; i++) {
+
+			if (array[i].isFile()) {
+				String name = array[i].getName();
+				if (name.endsWith(".dat")) {
+					list.add(array[i].getName());
+				}
+				// only take file name   
+				System.out.println("^^^^^" + array[i].getName());
+				// take file path and name   
+				System.out.println("#####" + array[i]);
+				// take file path and name   
+				System.out.println("*****" + array[i].getPath());
+			} else if (array[i].isDirectory()){
+				getFilesInPath(array[i].getPath());
+			}
+		}
+		return list;
 	}
 
 }

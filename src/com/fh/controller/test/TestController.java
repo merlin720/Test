@@ -2,6 +2,8 @@ package com.fh.controller.test;
 
 import com.fh.entity.TestVo;
 import com.fh.entity.UpdateModel;
+import com.fh.util.FileCharsetConverter;
+import com.fh.util.FileUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +19,11 @@ import java.util.*;
 @Controller
 @RequestMapping(value = "/test")
 public class TestController {
+    /**
+     * 返回文件内容的接口
+     * @param testVo
+     * @return
+     */
     @RequestMapping(value = "queryFileContent", method = RequestMethod.POST)
     @ResponseBody//TestVo testVo
     public Map<String, Object> queryFileContent(@RequestBody TestVo testVo) {
@@ -57,6 +64,11 @@ public class TestController {
         return modelMap;
     }
 
+    /**
+     * 修改文件内容的接口
+     * @param model
+     * @return
+     */
     @RequestMapping(value = "updateFileContent", method = RequestMethod.POST)
     @ResponseBody
     public Map<String, Object> updateFileContent(@RequestBody UpdateModel model) {
@@ -100,6 +112,30 @@ public class TestController {
         }
         return modelMap;
     }
+    @RequestMapping(value = "queryFiles", method = RequestMethod.POST)
+    @ResponseBody//TestVo testVo
+    public Map<String, Object> queryFiles(@RequestBody TestVo testVo) {
+        Map<String, Object> modelMap = new HashMap<String, Object>();
+        try {
+            System.out.println("1111111");
+            List<String> list = new ArrayList<String>();
+            System.out.println(testVo.getFilePath());
+            try {
+                modelMap.put("message", "获取结果");
+                modelMap.put("code", "0");
+                modelMap.put("data", FileUtil.getFilesInPath(testVo.getFilePath()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            modelMap.put("message", "系统内部错误");
+            modelMap.put("code", "1");
+            modelMap.put("data", null);
+        }
 
+
+        return modelMap;
+    }
 
 }
