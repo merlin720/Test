@@ -1,5 +1,6 @@
 package com.fh.controller.test;
 
+import com.fh.entity.SettingModel;
 import com.fh.entity.TestVo;
 import com.fh.entity.UpdateModel;
 import com.fh.util.FileCharsetConverter;
@@ -119,11 +120,14 @@ public class TestController {
         try {
             System.out.println("1111111");
             List<String> list = new ArrayList<String>();
+            FileUtil.list.clear();
+                list  =  FileUtil.getFilesInPath(testVo.getFilePath());
             System.out.println(testVo.getFilePath());
+            System.out.println(testVo.getEndStr());
             try {
                 modelMap.put("message", "获取结果");
                 modelMap.put("code", "0");
-                modelMap.put("data", FileUtil.getFilesInPath(testVo.getFilePath()));
+                modelMap.put("data", list);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -137,5 +141,30 @@ public class TestController {
 
         return modelMap;
     }
+    @RequestMapping(value = "querySettingFiles", method = RequestMethod.POST)
+    @ResponseBody//TestVo testVo
+    public Map<String, Object> querySettingFiles(@RequestBody SettingModel settingModel) {
+        Map<String, Object> modelMap = new HashMap<String, Object>();
+        try {
+            System.out.println("1111111");
+            List<String> list = new ArrayList<String>();
+            FileUtil.list.clear();
+                list =FileUtil.getFilesInPath(settingModel.getFilePath(),settingModel.getEndStr());
+            try {
+                modelMap.put("message", "获取结果");
+                modelMap.put("code", "0");
+                modelMap.put("data", list);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            modelMap.put("message", "系统内部错误");
+            modelMap.put("code", "1");
+            modelMap.put("data", null);
+        }
 
+
+        return modelMap;
+    }
 }

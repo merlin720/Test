@@ -211,28 +211,34 @@ public class FileUtil {
 		}
 	}
 
-	public static List<String> getFilesInPath(String path) {
-		List<String> list = new ArrayList<String>();
+	public static List<String> getFilesInPath(String path){
+		return getFilesInPath(path,".dat");
+	}
+	public static List<String> list = new ArrayList<String>();
+	public static List<String> getFilesInPath(String path,String endWithStr) {
+
 		File file = new File(path);
 		File[] array = file.listFiles();
 		for (int i = 0; i < array.length; i++) {
 
 			if (array[i].isFile()) {
 				String name = array[i].getName();
-				if (name.endsWith(".dat")) {
+				if (name.endsWith(endWithStr) || ".ini".equals(endWithStr)) {
 					list.add(array[i].getName());
 				}
-				// only take file name   
+//				// only take file name   
 				System.out.println("^^^^^" + array[i].getName());
-				// take file path and name   
-				System.out.println("#####" + array[i]);
-				// take file path and name   
-				System.out.println("*****" + array[i].getPath());
+//				// take file path and name   
+//				System.out.println("#####" + array[i]);
+//				// take file path and name   
+//				System.out.println("*****" + array[i].getPath());
 			} else if (array[i].isDirectory()){
-				getFilesInPath(array[i].getPath());
+				getFilesInPath(array[i].getPath(),endWithStr);
 			}
 		}
+
 		return list;
 	}
+
 
 }

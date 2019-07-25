@@ -3,18 +3,17 @@ package com.fh.entity;
 /**
  * Created by RX-78 on 2019/7/16.
  */
-public class TestVo {
+public class SettingModel {
     private String filePath;
     private String fileName;
     private String endStr;
 
-    public TestVo() {
+    public SettingModel() {
     }
 
-    public TestVo(String filePath, String fileName,String endStr) {
+    public SettingModel(String filePath, String fileName) {
         this.filePath = filePath;
         this.fileName = fileName;
-        this.endStr = endStr;
     }
 
     public String getFilePath() {
