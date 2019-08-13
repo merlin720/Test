@@ -4,6 +4,11 @@ public class UpdateModel {
     private String filePath;
     private String key1;
     private String value;
+    private String signal;
+    /**
+     * 是否需要添加分号
+     */
+    private String needAddF;
 
     public UpdateModel() {
     }
@@ -30,5 +35,21 @@ public class UpdateModel {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public String getSignal() {
+        return signal;
+    }
+
+    public void setSignal(String signal) {
+        this.signal = signal;
+    }
+
+    public String getNeedAddF() {
+        return needAddF;
+    }
+
+    public void setNeedAddF(String needAddF) {
+        this.needAddF = needAddF;
     }
 }

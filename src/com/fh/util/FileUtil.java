@@ -49,7 +49,7 @@ public class FileUtil {
 	 * 
 	 * @param filePathAndName
 	 *            String 文件路径及名称 如c:/fqf.txt
-	 * @param fileContent
+	 * @param filePathAndName
 	 *            String
 	 * @return boolean
 	 */
@@ -181,7 +181,7 @@ public class FileUtil {
 	/**
 	 * Mapped File way MappedByteBuffer 可以在处理大文件时，提升性能
 	 * 
-	 * @param filename
+	 * @param filePath
 	 * @return
 	 * @throws IOException
 	 */
@@ -223,8 +223,16 @@ public class FileUtil {
 
 			if (array[i].isFile()) {
 				String name = array[i].getName();
-				if (name.endsWith(endWithStr) || ".ini".equals(endWithStr)) {
-					list.add(array[i].getName());
+				if (name.endsWith(endWithStr) ) {
+					if (".ini".equals(endWithStr)) {
+						list.add(array[i].getPath());
+					} else {
+						list.add(array[i].getName());
+					}
+				}else if (".ini".equals(endWithStr)) {
+					if (name.endsWith(".txt")){
+						list.add(array[i].getPath());
+					}
 				}
 //				// only take file name   
 				System.out.println("^^^^^" + array[i].getName());
