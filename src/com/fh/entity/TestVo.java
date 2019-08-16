@@ -8,6 +8,7 @@ public class TestVo {
     private String fileName;
     private String endStr;
     private String key;
+    private String basePath;
 
 
     public TestVo() {
@@ -49,6 +50,14 @@ public class TestVo {
 
     public void setKey(String key) {
         this.key = key;
+    }
+
+    public String getBasePath() {
+        return basePath;
+    }
+
+    public void setBasePath(String basePath) {
+        this.basePath = basePath;
     }
 }
 

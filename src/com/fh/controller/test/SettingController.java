@@ -2,6 +2,8 @@ package com.fh.controller.test;
 
 import com.fh.entity.*;
 import com.fh.util.FileUtil;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.*;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -94,7 +97,7 @@ public class SettingController {
             System.out.println(testVo.getDestPath());
 
             try {
-                copyDirectiory(testVo.getSourcePath(),testVo.getDestPath());
+                FileUtil.copyDirectiory(testVo.getSourcePath(), testVo.getDestPath());
                 modelMap.put("message", "获取结果");
                 modelMap.put("code", "0");
                 modelMap.put("data", "创建成功");
@@ -126,7 +129,7 @@ public class SettingController {
             System.out.println(testVo.getFilePath());
             File srcFile = new File(testVo.getFilePath());
 
-            deleteFile(srcFile);
+            FileUtil.deleteFile(srcFile);
             modelMap.put("message", "获取结果");
             modelMap.put("code", "0");
             modelMap.put("data", "创建成功");
@@ -142,85 +145,145 @@ public class SettingController {
         return modelMap;
     }
 
-    private static void copyFile(File sourcefile, File targetFile) throws IOException {
+    /**
+     * @param testVo
+     * @return
+     */
+    @RequestMapping(value = "getProcessSeting", method = RequestMethod.POST)
+    @ResponseBody//TestVo testVo
+    public Map<String, Object> getProcessSeting(@RequestBody TestVo testVo) {
+        Map<String, Object> modelMap = new HashMap<String, Object>();
+        try {
+            System.out.println("1111111");
 
-        // 新建文件输入流并对它进行缓冲
-        FileInputStream input = new FileInputStream(sourcefile);
+            HashMap<String, String> map = new HashMap<String, String>();
+            System.out.println(testVo.getFilePath());
 
-        // 新建文件输出流并对它进行缓冲
-        FileOutputStream out = new FileOutputStream(targetFile);
-        BufferedOutputStream outbuff = new BufferedOutputStream(out);
-
-        // 缓冲数组
-        byte[] b = new byte[1024];
-        int len = 0;
-        while ((len = input.read(b)) != -1) {
-            outbuff.write(b, 0, len);
-        }
-
-        //关闭文件
-        outbuff.close();
-        input.close();
-
-    }
-
-    private static void copyDirectiory(String sourceDir, String targetDir) throws IOException {
-
-        // 新建目标目录
-        (new File(targetDir)).mkdirs();
-
-        // 获取源文件夹当下的文件或目录
-        File[] file = (new File(sourceDir)).listFiles();
-
-        for (int i = 0; i < file.length; i++) {
-            if (file[i].isFile()) {
-                // 源文件
-                File sourceFile = file[i];
-                // 目标文件
-                File targetFile = new File(targetDir + File.separator + sourceFile.getName());
-                copyFile(sourceFile, targetFile);
-
-            }
-
-            if (file[i].isDirectory()) {
-                // 准备复制的源文件夹
-                String dir1 = sourceDir + File.separator + file[i].getName();
-                // 准备复制的目标文件夹
-                String dir2 = targetDir + File.separator + file[i].getName();
-
-                copyDirectiory(dir1, dir2);
-            }
-        }
-
-    }
-
-
-
-    private static void deleteFile(File file) {
-        // 判断传递进来的是文件还是文件夹,如果是文件,直接删除,如果是文件夹,则判断文件夹里面有没有东西
-        if (file.isDirectory()) {
-            // 如果是目录,就删除目录下所有的文件和文件夹
-            File[] files = file.listFiles();
-            // 遍历目录下的文件和文件夹
-            for (File f : files) {
-                // 如果是文件,就删除
-                if (f.isFile()) {
-                    System.out.println("已经被删除的文件:" + f);
-                    // 删除文件
-                    f.delete();
-                } else if (file.isDirectory()) {
-                    // 如果是文件夹,就递归调用文件夹的方法
-                    deleteFile(f);
+            FileInputStream fileInputStream = new FileInputStream(testVo.getFilePath());
+            InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "utf-8");
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+            String str = "";
+            String target = "";
+            while ((str = bufferedReader.readLine()) != null) {
+                String[] split = str.split("=");
+                if (split.length > 1 && testVo.getKey().equals(split[0])) {
+                    target = split[1].substring(0, split[1].length() - 1);
                 }
             }
-            // 删除文件夹自己,如果它低下是空的,就会被删除
-            System.out.println("已经被删除的文件夹:" + file);
-            file.delete();
+            String srcFile = testVo.getBasePath() + target;
+            File file = new File(srcFile, testVo.getFileName());
+            FileInputStream fileInputStream11 = new FileInputStream(file);
+            InputStreamReader inputStreamReader1 = new InputStreamReader(fileInputStream11, "utf-8");
+            BufferedReader bufferedReader1 = new BufferedReader(inputStreamReader1);
+            String str1 = "";
+            map.put("currentPath", file.getPath());
+            while ((str1 = bufferedReader1.readLine()) != null) {
+                System.out.println(str1);
+                String[] split = str1.split("=");
+                if (split.length > 1) {
+                    map.put(split[0], split[1].substring(0, split[1].length() - 1));
+                }
+
+            }
+            modelMap.put("message", "获取结果");
+            modelMap.put("code", "0");
+            modelMap.put("data", map);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            modelMap.put("message", "系统内部错误");
+            modelMap.put("code", "1");
+            modelMap.put("data", null);
         }
 
-        // 如果是文件,就直接删除自己
-        System.out.println("已经被删除的文件:" + file);
-        file.delete();
 
+        return modelMap;
     }
+
+    /**
+     * 修改文件内容的接口
+     *
+     * @param model
+     * @return
+     */
+    @RequestMapping(value = "updateFileContent", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> updateFileContent(@RequestBody ProcessUpdateModel model) {
+        Map<String, Object> modelMap = new HashMap<String, Object>();
+        FileInputStream fileInputStream = null;
+        InputStreamReader inputStreamReader = null;
+        BufferedReader bufferedReader = null;
+        FileOutputStream fos = null;
+        PrintWriter pw = null;
+
+        try {
+            String map = model.getMap();
+            System.out.println(map);
+            Type type = new TypeToken<HashMap<String, String>>() {
+            }.getType();
+            Gson gson = new Gson();
+            HashMap<String, String> hashMap = gson.fromJson(map, type);
+            String path = model.getFilePath();
+            File srcFile = new File(path);
+            fileInputStream = new FileInputStream(srcFile);
+            inputStreamReader = new InputStreamReader(fileInputStream, "utf-8");
+            bufferedReader = new BufferedReader(inputStreamReader);
+            String str = "";
+            StringBuffer buf = new StringBuffer();
+            while ((str = bufferedReader.readLine()) != null) {
+                String split[] = str.split("=");
+                if (split.length>1){
+                    if (null != hashMap.get(split[0])) {
+                        str = split[0] + "=" + hashMap.get(split[0]) + ";";
+                    }
+                }
+                System.out.println(str);
+                buf.append(str);
+                buf = buf.append(System.getProperty("line.separator"));
+            }
+            fos = new FileOutputStream(srcFile);
+            pw = new PrintWriter(fos);
+            pw.write(buf.toString().toCharArray());
+            pw.flush();
+            pw.close();
+            fos.close();
+            bufferedReader.close();
+            inputStreamReader.close();
+            fileInputStream.close();
+
+            modelMap.put("message", "获取结果");
+            modelMap.put("code", "0");
+            modelMap.put("data", null);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            modelMap.put("message", "系统内部错误");
+            modelMap.put("code", "1");
+            modelMap.put("data", null);
+            if (null != pw) {
+                pw.flush();
+                pw.close();
+            }
+
+            try {
+                if (null != fos) {
+                    fos.close();
+                }
+                if (null != bufferedReader) {
+                    bufferedReader.close();
+                }
+                if (null != inputStreamReader) {
+                    inputStreamReader.close();
+                }
+                if (null != fileInputStream) {
+                    fileInputStream.close();
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+
+        }
+        return modelMap;
+    }
+
 }
